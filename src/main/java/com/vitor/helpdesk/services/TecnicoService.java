@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.vitor.helpdesk.domain.Tecnico;
 import com.vitor.helpdesk.domain.repositories.TecnicoRepository;
+import com.vitor.helpdesk.dtos.TecnicoDto;
 import com.vitor.helpdesk.services.exceptions.ObjectNotFoundExceptions;
 
 @Service
@@ -23,6 +24,12 @@ public class TecnicoService {
 
 	public List<Tecnico> findAll() {
 		return tecnicoRepository.findAll();
+	}
+
+	public Tecnico insertTecnico(TecnicoDto objDTO) {
+		objDTO.setId(null);
+		Tecnico newObj = new Tecnico (objDTO);
+		return tecnicoRepository.save(newObj);
 	}
 	
 
