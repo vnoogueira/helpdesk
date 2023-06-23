@@ -1,8 +1,8 @@
 package com.vitor.helpdesk.services;
 
+import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,4 +20,10 @@ public class TecnicoService {
 		Optional<Tecnico> tecnico = tecnicoRepository.findById(id);
 		return tecnico.orElseThrow(() -> new ObjectNotFoundExceptions("Objeto não encontrado - ID: " + id));
 	}
+
+	public List<Tecnico> findAll() {
+		return tecnicoRepository.findAll();
+	}
+	
+
 }
