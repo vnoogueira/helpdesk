@@ -3,6 +3,8 @@ package com.vitor.helpdesk.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +53,13 @@ public class ClienteService {
 			throw new DataIntegrityViolationException("E-mail já cadastrado no sistema!");
 		}
 
+	}
+
+	public Cliente updateCliente(Integer id, @Valid ClienteDTO objDTO) {
+		objDTO.setId(id);
+		Cliente oldCliente = findById(id);
+		oldCliente = new Cliente(objDTO);
+		return clienteRepository.save(oldCliente);
 	}
 
 }
