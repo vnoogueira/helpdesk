@@ -49,15 +49,21 @@ public class TecnicoService {
 		return tecnicoRepository.save(oldTecnico);
 	}
 
+	public void deleteTecnico(Integer id) {
+		Tecnico obj = findById(id);
+		if (obj.getChamados().size() > 0) {
+			throw new DataIntegrityViolationException("Técnico não pode ser deletado, pois possue chamado!");
+		}
+		tecnicoRepository.deleteById(id);
+	}
+
 	private void validaCpfeEmail(TecnicoDto objDTO) {
 		Optional<Pessoa> obj = pessoaRepository.findByCpf(objDTO.getCpf());
 
 		if (obj.isPresent() && obj.get().getId() != objDTO.getId()) {
 			throw new DataIntegrityViolationException("CPF já cadastrado no sistema!");
 		}
-
 		obj = pessoaRepository.findByEmail(objDTO.getEmail());
-
 		if (obj.isPresent() && obj.get().getId() != objDTO.getId()) {
 			throw new DataIntegrityViolationException("E-mail já cadastrado no sistema!");
 		}
