@@ -57,7 +57,7 @@ public class TecnicoService {
 		tecnicoRepository.deleteById(id);
 	}
 
-	private void validaCpfeEmail(TecnicoDto objDTO) {
+	public void validaCpfeEmail(TecnicoDto objDTO) {
 		Optional<Pessoa> obj = pessoaRepository.findByCpf(objDTO.getCpf());
 
 		if (obj.isPresent() && obj.get().getId() != objDTO.getId()) {

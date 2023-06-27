@@ -7,25 +7,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vitor.helpdesk.domain.Cliente;
+import com.vitor.helpdesk.domain.Pessoa;
 import com.vitor.helpdesk.domain.repositories.ClienteRepository;
+import com.vitor.helpdesk.domain.repositories.PessoaRepository;
+import com.vitor.helpdesk.dtos.ClienteDTO;
+import com.vitor.helpdesk.services.exceptions.DataIntegrityViolationException;
 import com.vitor.helpdesk.services.exceptions.ObjectNotFoundExceptions;
 
 @Service
 public class ClienteService {
-	
+
 	@Autowired
 	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private PessoaRepository pessoaRepository;
 	
 
 	public List<Cliente> findAll() {
 		return clienteRepository.findAll();
 	}
 
-
 	public Cliente findById(Integer id) {
 		Optional<Cliente> cliente = clienteRepository.findById(id);
-		
 		return cliente.orElseThrow(() -> new ObjectNotFoundExceptions("Cliente não encontrado ! - ID: " + id));
+	}
+
+	public Cliente insertCliente(ClienteDTO objDTO) {
+		objDTO.setId(null);
+		validaCpfeEmail(objDTO);
+		Cliente newCliente = new Cliente(objDTO);
+		return clienteRepository.save(newCliente);
+	}
+	
+	public void validaCpfeEmail(ClienteDTO objDTO) {
+		Optional<Pessoa> obj = pessoaRepository.findByCpf(objDTO.getCpf());
+
+		if (obj.isPresent() && obj.get().getId() != objDTO.getId()) {
+			throw new DataIntegrityViolationException("CPF já cadastrado no sistema!");
+		}
+		obj = pessoaRepository.findByEmail(objDTO.getEmail());
+		if (obj.isPresent() && obj.get().getId() != objDTO.getId()) {
+			throw new DataIntegrityViolationException("E-mail já cadastrado no sistema!");
+		}
+
 	}
 
 }
