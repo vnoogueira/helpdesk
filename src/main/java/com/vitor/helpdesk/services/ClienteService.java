@@ -21,10 +21,9 @@ public class ClienteService {
 
 	@Autowired
 	private ClienteRepository clienteRepository;
-	
+
 	@Autowired
 	private PessoaRepository pessoaRepository;
-	
 
 	public List<Cliente> findAll() {
 		return clienteRepository.findAll();
@@ -41,7 +40,7 @@ public class ClienteService {
 		Cliente newCliente = new Cliente(objDTO);
 		return clienteRepository.save(newCliente);
 	}
-	
+
 	public void validaCpfeEmail(ClienteDTO objDTO) {
 		Optional<Pessoa> obj = pessoaRepository.findByCpf(objDTO.getCpf());
 
@@ -60,6 +59,14 @@ public class ClienteService {
 		Cliente oldCliente = findById(id);
 		oldCliente = new Cliente(objDTO);
 		return clienteRepository.save(oldCliente);
+	}
+
+	public void deleteClienteById(Integer id) {
+		Cliente cliente = findById(id);
+		if (cliente.getChamados().size() > 0) {
+			throw new DataIntegrityViolationException("Cliente não pode ser deletado, pois possue chamado!");
+		}
+		clienteRepository.deleteById(id);
 	}
 
 }
