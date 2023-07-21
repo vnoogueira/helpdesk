@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vitor.helpdesk.domain.Pessoa;
@@ -24,6 +25,9 @@ public class TecnicoService {
 
 	@Autowired
 	private PessoaRepository pessoaRepository;
+	
+	@Autowired
+	private BCryptPasswordEncoder enconder;
 
 	public Tecnico findById(Integer id) {
 		Optional<Tecnico> tecnico = tecnicoRepository.findById(id);
@@ -36,6 +40,7 @@ public class TecnicoService {
 
 	public Tecnico insertTecnico(TecnicoDto objDTO) {
 		objDTO.setId(null);
+		objDTO.setSenha(enconder.encode(objDTO.getSenha()));
 		validaCpfeEmail(objDTO);
 		Tecnico newObj = new Tecnico(objDTO);
 		return tecnicoRepository.save(newObj);
