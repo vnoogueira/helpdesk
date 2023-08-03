@@ -12,11 +12,11 @@ import com.vitor.helpdesk.services.DBService;
 public class TestConfig {
 	
 	@Autowired
-	private DBService dbservice;
+	private DBService dbService;
 	
 	@Bean
-	public void instanciaDb() {
-		this.dbservice.instaciaSB();
+	public void instanciaDB() {
+		this.dbService.instanciaDB();
 	}
 
 }

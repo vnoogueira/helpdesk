@@ -13,16 +13,15 @@ import com.vitor.helpdesk.services.DBService;
 public class DevConfig {
 	
 	@Autowired
-	private DBService dbservice;
+	private DBService dbService;
 	
 	@Value("${spring.jpa.hibernate.ddl-auto}")
 	private String value;
 	
-	
 	@Bean
-	public boolean instanciaDb() {
+	public boolean instanciaDB() {
 		if(value.equals("create")) {
-			this.dbservice.instaciaSB();
+			this.dbService.instanciaDB();
 		}
 		return false;
 	}

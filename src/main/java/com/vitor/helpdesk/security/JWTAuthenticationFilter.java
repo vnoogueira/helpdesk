@@ -20,11 +20,12 @@ import com.vitor.helpdesk.dtos.CredenciaisDTO;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-	private AuthenticationManager authenticationMenager;
+	private AuthenticationManager authenticationManager;
 	private JWTUtil jwtUtil;
 
-	public JWTAuthenticationFilter(AuthenticationManager authenticationMenager, JWTUtil jwtUtil) {
-		this.authenticationMenager = authenticationMenager;
+	public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+		super();
+		this.authenticationManager = authenticationManager;
 		this.jwtUtil = jwtUtil;
 	}
 
@@ -32,11 +33,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 		try {
-			CredenciaisDTO credenciais = new ObjectMapper().readValue(request.getInputStream(), CredenciaisDTO.class);
+			CredenciaisDTO creds = new ObjectMapper().readValue(request.getInputStream(), CredenciaisDTO.class);
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-					credenciais.getEmail(), credenciais.getSenha(), new ArrayList<>());
-			Authentication authentication = authenticationMenager.authenticate(authenticationToken);
-
+					creds.getEmail(), creds.getSenha(), new ArrayList<>());
+			Authentication authentication = authenticationManager.authenticate(authenticationToken);
 			return authentication;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -44,17 +44,21 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	}
 
 	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
-		String userName = ((UserSS) authResult.getPrincipal()).getUsername();
-		String token = jwtUtil.generateToken(userName);
-		response.setHeader("access-control-expose-headers", "Authorization");
-		response.setHeader("Authorization", "Bearer " + token);
+	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
+			Authentication auth) throws IOException, ServletException {
+
+		String username = ((UserSS) auth.getPrincipal()).getUsername();
+		String token = jwtUtil.generateToken(username);
+		res.setHeader("Access-Control-Allow-Origin", "*");
+		res.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
+		res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, enctype, Location");
+		res.setHeader("Authorization", "Bearer " + token);
 	}
 
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException failed) throws IOException, ServletException {
+
 		response.setStatus(401);
 		response.setContentType("application/json");
 		response.getWriter().append(json());
@@ -62,8 +66,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 	private CharSequence json() {
 		long date = new Date().getTime();
-		return "{" + "\"timestamp\": " + date + ", " + "\"status\": 401, " + "\"error\": \"Não Autorizado\", "
-				+ "\"message\": \"E-mail ou senha inválidos\", " + "\"path\": \"/login\"}";
+		return "{" + "\"timestamp\": " + date + ", " + "\"status\": 401, " + "\"error\": \"Não autorizado\", "
+				+ "\"message\": \"Email ou senha inválidos\", " + "\"path\": \"/login\"}";
 	}
 
 }
