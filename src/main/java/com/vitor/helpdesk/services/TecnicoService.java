@@ -25,7 +25,7 @@ public class TecnicoService {
 
 	@Autowired
 	private PessoaRepository pessoaRepository;
-	
+
 	@Autowired
 	private BCryptPasswordEncoder enconder;
 
@@ -49,6 +49,9 @@ public class TecnicoService {
 	public Tecnico updateTecnico(Integer id, @Valid TecnicoDto objDTO) {
 		objDTO.setId(id);
 		Tecnico oldTecnico = findById(id);
+		if (!objDTO.getSenha().equals(oldTecnico.getSenha())) {
+			objDTO.setSenha(enconder.encode(objDTO.getSenha()));
+		}
 		validaCpfeEmail(objDTO);
 		oldTecnico = new Tecnico(objDTO);
 		return tecnicoRepository.save(oldTecnico);

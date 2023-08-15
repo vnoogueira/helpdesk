@@ -25,7 +25,7 @@ public class ClienteService {
 
 	@Autowired
 	private PessoaRepository pessoaRepository;
-	
+
 	@Autowired
 	private BCryptPasswordEncoder enconder;
 
@@ -49,6 +49,9 @@ public class ClienteService {
 	public Cliente updateCliente(Integer id, @Valid ClienteDTO objDTO) {
 		objDTO.setId(id);
 		Cliente oldCliente = findById(id);
+		if (!objDTO.getSenha().equals(oldCliente.getSenha())) {
+			objDTO.setSenha(enconder.encode(objDTO.getSenha()));
+		}
 		oldCliente = new Cliente(objDTO);
 		return clienteRepository.save(oldCliente);
 	}
